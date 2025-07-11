@@ -81,9 +81,9 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.post('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-     data.filter((d) => d.id !== id)
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Stringg(request.params.id)
+     data = data.filter((d) => d.id !== id)
     response.status(204).end()
 })
 
