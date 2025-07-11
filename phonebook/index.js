@@ -82,11 +82,20 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Stringg(request.params.id)
-     data = data.filter((d) => d.id !== id)
-    response.status(204).end()
-})
+    const id = String(request.params.id);
+    console.log('Attempting to delete id:', id);
+    
+    const initialLength = data.length;
+    data = data.filter((d) => d.id !== id);
 
+    if (data.length === initialLength) {
+        // No item was removed: id not found
+        console.log(`ID ${id} not found.`);
+        return response.status(404).json({ error: 'Person not found' });
+    }
+    console.log(`Deleted person with id: ${id}`);
+    response.status(204).end();
+});
 app.post('/api/persons', (request, response) => {
     const body = request.body;
 
