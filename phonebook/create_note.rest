@@ -14,3 +14,12 @@ Content-Type: application/json
   "name": "Bruce Brown",
   "number": "323-324-2422"
 }
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "bruce BROWN",
+  "number": "323-324-2422"
+}
