@@ -48,7 +48,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id) // ✅ FIX: capitalization of `findByIdAndRemove`
+  Person.findByIdAndDelete(req.params.id) // ✅ FIX: capitalization of `findByIdAndRemove`
     .then(() => res.status(204).end())
     .catch((error) => next(error))
 })
@@ -59,12 +59,13 @@ app.post('/api/persons', (req, res, next) => {
   if (!body.name || !body.number) {
     return res.status(400).json({ error: 'Content Missing' })
   }
+  
 
   // ✅ FIX: Cannot use `.some()` on Mongoose model directly; must query the DB
   Person.findOne({ name: body.name })
     .then((existing) => {
       if (existing) {
-        return res.status(400).json({ error: 'Name is already included. Please add a new name.' })
+        (console.log(`${existing} has been updated`))
       }
 
       const person = new Person({
@@ -80,19 +81,45 @@ app.post('/api/persons', (req, res, next) => {
     .catch((error) => next(error))
 })
 
+
+
+app.put('/api/persons/:id', (req, res) => {
+    const { number} = req.body
+  const id = req.params.id 
+
+    Person.findByIdAndUpdate(
+        id, 
+        {number}, 
+        {new: true, runValidators:true, context: 'query'}
+    )
+    .then(updatedPerson => {
+        if (updatedPerson) {
+            res.json(updatedPerson); 
+        } else {
+            res.status(404).send({error: 'Person not found'})
+        }
+    }).catch(error => next(error))
+});
+
 // ✅ Unknown endpoint handler (optional)
 app.use((req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 })
 
-// ✅ Error handler (for .catch(next) usage)
+// ✅ Single global error handler
 app.use((error, req, res, next) => {
-  console.error(error.message)
-  if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' })
-  }
-  next(error)
-})
+    console.error('ERROR:', error.message);
+  
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
+  
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'malformatted id' });
+    }
+  
+    res.status(500).json({ error: 'Something went wrong' });
+  });
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
