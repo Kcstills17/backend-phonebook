@@ -40,14 +40,14 @@ app.get('/', (request, response) => {
     response.send('<h1> Hello World!</h1>')
 })
 
-app.get('/api/notes', (request, response) => {
+app.get('/api/persons', (request, response) => {
     response.json(notes)
 })
 
 
 
   
-  app.post('/api/notes', (request, response) => {
+  app.post('/api/persons', (request, response) => {
     const body = request.body
   
     if (!body.content) {
@@ -55,19 +55,17 @@ app.get('/api/notes', (request, response) => {
         error: 'content missing' 
       })
     }
-  
-    const note = {
-      content: body.content,
-      important: body.important || false,
+    const person = {
       id: generateId(),
+      name: body.name,
+      number: body.number
     }
   
-    notes = notes.concat(note)
-  
-    response.json(note)
+    notes = notes.concat(person)
+    response.json(person)
   })
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id 
     const note = notes.find((n) => n.id === id)
     if (note) {
@@ -78,7 +76,7 @@ app.get('/api/notes/:id', (request, response) => {
 })
 
 
-app.delete('/api/notes/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id 
     notes = notes.filter((n) => n.id !== id)
     response.status(204).end()
