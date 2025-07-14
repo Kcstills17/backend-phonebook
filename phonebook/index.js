@@ -56,11 +56,6 @@ app.delete('/api/persons/:id', (req, res, next) => {
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
-  if (!body.name || !body.number) {
-    return res.status(400).json({ error: 'Content Missing' })
-  }
-  
-
   // ✅ FIX: Cannot use `.some()` on Mongoose model directly; must query the DB
   Person.findOne({ name: body.name })
     .then((existing) => {
@@ -83,7 +78,7 @@ app.post('/api/persons', (req, res, next) => {
 
 
 
-app.put('/api/persons/:id', (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
     const { number} = req.body
   const id = req.params.id 
 
@@ -111,7 +106,8 @@ app.use((error, req, res, next) => {
     console.error('ERROR:', error.message);
   
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ error: error.message });
+        
+      return res.status(400).json({ error: error.message }, console.log('test'));
     }
   
     if (error.name === 'CastError') {
